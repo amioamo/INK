@@ -110,17 +110,12 @@ def PPKI_coef(ref_list, real_list, df_real, df_ref, K, eps, output_dir, seed, ep
                 copy_ref[str(user_id_ref[j])] = copy_ref.apply(lambda x: randomized_response(x[str(user_id_ref[j])],
                                                                                              p, q), axis=1)
 
-        # first, compute the coefficients on training set and obtain the thresholds
-        dis = []
-        for order, ids in enumerate(ref_list):
-            coef_ref = calculate_coef(copy_ref, ids)
-            dis.append(list(coef_ref.values()))
+        # return the pre-defined thresholds
+        if len(real_list) == 4: # four-group task
+            threshold = [0.175, 0.08, 0.025, 0.025]
+        else: # binary task
+            threshold = [0.025, 0.025]
 
-        threshold = select_threshold(np.array(dis), 0)
-        if not eps_flag:
-            np.savetxt(output_dir + str(K) + '/thresholds' + str(i_iter) + '.txt', threshold)
-        else:
-            np.savetxt(output_dir + str(K) + '/thresholds' + str(i_iter) + '_with_noise.txt', threshold)
         # then, compute the coefficients on testing set and do the classification
         for order, ids in enumerate(real_list):
             coef_real = calculate_coef(copy_real, ids)
